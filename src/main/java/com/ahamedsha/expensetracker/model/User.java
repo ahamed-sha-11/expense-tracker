@@ -1,13 +1,15 @@
 package com.ahamedsha.expensetracker.model;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 @Entity
 @Table(name = "users")
 @Builder
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
     @Id

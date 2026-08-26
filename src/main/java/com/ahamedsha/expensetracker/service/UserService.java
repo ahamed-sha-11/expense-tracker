@@ -2,12 +2,13 @@ package com.ahamedsha.expensetracker.service;
 
 import com.ahamedsha.expensetracker.dto.UserRequestDTO;
 import com.ahamedsha.expensetracker.dto.UserResponseDTO;
+import com.ahamedsha.expensetracker.exception.ApiException;
 import com.ahamedsha.expensetracker.model.User;
 import com.ahamedsha.expensetracker.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -15,11 +16,11 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public List<UserResponseDTO> findAll() {
-        return null;
+    public User findById(long id) {
+        return userRepository.findById(id).orElseThrow(() -> new ApiException.ResourceNotFoundException(id));
     }
 
-    public UserResponseDTO addUser(UserRequestDTO userRequestDTO) {
+    public User addUser(UserRequestDTO userRequestDTO) {
         User user = User.builder()
                 .username(userRequestDTO.getUsername())
                 .email(userRequestDTO.getEmail())
@@ -27,6 +28,15 @@ public class UserService {
                 .build();
 
 
-        return new UserResponseDTO(userRepository.save(user));
+        return userRepository.save(user);
+    }
+
+    public User updateUser(UserRequestDTO userRequestDTO) {
+
+        User user = findById(userRequestDTO.getId());
+        Optional.ofNullable(userRequestDTO.getUsername()).ifPresent(user::setUsername);
+        Optional.ofNullable(userRequestDTO.getEmail()).ifPresent(user::setEmail);
+
+        return userRepository.save(user);
     }
 }
