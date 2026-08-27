@@ -4,12 +4,12 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "users")
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = {"email"}))
 public class User {
 
     @Id
