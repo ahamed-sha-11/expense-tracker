@@ -6,7 +6,6 @@ import com.ahamedsha.expensetracker.users.model.User;
 import com.ahamedsha.expensetracker.users.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.Optional;
 
 @Service
