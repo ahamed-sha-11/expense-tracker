@@ -33,9 +33,9 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User updateUser(UserRequestDTO userRequestDTO) {
+    public User updateUser(long id, UserRequestDTO userRequestDTO) {
 
-        User user = findById(userRequestDTO.getId());
+        User user = findById(id);
         Optional.ofNullable(userRequestDTO.getUsername()).ifPresent(user::setUsername);
         Optional.ofNullable(userRequestDTO.getEmail()).ifPresent(user::setEmail);
 
