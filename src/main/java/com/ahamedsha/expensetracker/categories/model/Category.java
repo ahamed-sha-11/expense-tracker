@@ -1,5 +1,6 @@
-package com.ahamedsha.expensetracker.model;
+package com.ahamedsha.expensetracker.categories.model;
 
+import com.ahamedsha.expensetracker.users.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

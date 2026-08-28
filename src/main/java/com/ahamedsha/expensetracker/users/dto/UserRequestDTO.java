@@ -1,4 +1,4 @@
-package com.ahamedsha.expensetracker.dto;
+package com.ahamedsha.expensetracker.users.dto;
 
 import lombok.Data;
 

@@ -1,11 +1,9 @@
-package com.ahamedsha.expensetracker.service;
+package com.ahamedsha.expensetracker.users.service;
 
-import com.ahamedsha.expensetracker.dto.UserRequestDTO;
-import com.ahamedsha.expensetracker.dto.UserResponseDTO;
+import com.ahamedsha.expensetracker.users.dto.UserRequestDTO;
 import com.ahamedsha.expensetracker.exception.ApiException;
-import com.ahamedsha.expensetracker.model.User;
-import com.ahamedsha.expensetracker.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.ahamedsha.expensetracker.users.model.User;
+import com.ahamedsha.expensetracker.users.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 

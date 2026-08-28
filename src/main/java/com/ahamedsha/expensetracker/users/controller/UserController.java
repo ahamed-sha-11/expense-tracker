@@ -1,8 +1,8 @@
-package com.ahamedsha.expensetracker.controller;
+package com.ahamedsha.expensetracker.users.controller;
 
-import com.ahamedsha.expensetracker.dto.UserRequestDTO;
-import com.ahamedsha.expensetracker.dto.UserResponseDTO;
-import com.ahamedsha.expensetracker.service.UserService;
+import com.ahamedsha.expensetracker.users.dto.UserRequestDTO;
+import com.ahamedsha.expensetracker.users.dto.UserResponseDTO;
+import com.ahamedsha.expensetracker.users.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

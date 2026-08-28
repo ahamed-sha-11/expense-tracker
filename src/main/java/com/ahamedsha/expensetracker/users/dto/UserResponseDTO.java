@@ -1,6 +1,6 @@
-package com.ahamedsha.expensetracker.dto;
+package com.ahamedsha.expensetracker.users.dto;
 
-import com.ahamedsha.expensetracker.model.User;
+import com.ahamedsha.expensetracker.users.model.User;
 import lombok.Data;
 
 @Data

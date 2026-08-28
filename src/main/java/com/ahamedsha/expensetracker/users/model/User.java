@@ -1,4 +1,4 @@
-package com.ahamedsha.expensetracker.model;
+package com.ahamedsha.expensetracker.users.model;
 
 import jakarta.persistence.*;
 import lombok.*;
