@@ -26,6 +26,9 @@ public class UserService {
     }
 
     public User addUser(UserDTOs.Create request) {
+
+        userRepository.findByEmail(request.email()).ifPresent(user -> {throw new ApiException.DuplicateEmailException();} );
+
         User user = User.builder()
                 .username(request.username())
                 .email(request.email())

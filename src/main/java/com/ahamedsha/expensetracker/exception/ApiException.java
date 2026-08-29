@@ -14,4 +14,8 @@ public class ApiException {
         }
     }
 
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public static class DuplicateEmailException extends RuntimeException {
+        public DuplicateEmailException() {super("Email already exists!");}
+    }
 }
