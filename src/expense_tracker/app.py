@@ -1,6 +1,6 @@
 import fastapi
-from fastapi import APIRouter
-from .transaction import transaction_router
+from .transactions.router import transaction_router
+
 app = fastapi.FastAPI()
 
 @app.get("/")
