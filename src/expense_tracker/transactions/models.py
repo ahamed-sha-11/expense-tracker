@@ -34,7 +34,7 @@ class Transaction(Base):
     amount = Column(Numeric(12, 2), nullable=False)
     transaction_type = Column(IntEnumType(TransactionType), nullable=False)
     category = Column(Integer, nullable=False)
-    note = Column(String(80))
+    note = Column(String(80), nullable=True)
     transaction_date_time = Column(BigInteger, nullable=False)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
 

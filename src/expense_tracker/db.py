@@ -1,6 +1,7 @@
 import os
+from collections.abc import AsyncIterator
 
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./test.db")
@@ -12,10 +13,10 @@ class Base(DeclarativeBase):
 engine = create_async_engine(DATABASE_URL)
 async_session = async_sessionmaker(engine, expire_on_commit=False)
 
-async  def create_db_and_tables():
+async def create_db_and_tables() -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-async def get_async_session():
+async def get_async_session() -> AsyncIterator[AsyncSession]:
     async with async_session() as session:
         yield session
