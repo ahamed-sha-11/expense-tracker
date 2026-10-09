@@ -1,9 +1,8 @@
 from datetime import datetime
 from decimal import Decimal
-
-from pydantic import AwareDatetime, BaseModel, Field
-
+from pydantic import AwareDatetime, BaseModel, Field, ConfigDict
 from .models import TransactionType
+
 
 class TransactionCreate(BaseModel):
     amount: Decimal = Field(gt=0, max_digits=12, decimal_places=2)
@@ -11,6 +10,13 @@ class TransactionCreate(BaseModel):
     category: int = Field(gt=0)
     note: str | None = Field(default=None, max_length=80)
     transaction_date_time: AwareDatetime
+
+class TransactionUpdate(BaseModel):
+    amount: Decimal | None = Field(default=None, gt=0, max_digits=12, decimal_places=2)
+    transaction_type: TransactionType | None = None
+    category_id: int | None = Field(default=None, gt=0)
+    note: str | None = Field(default=None, max_length=80)
+    transaction_date_time: datetime | None = None
 
 
 class TransactionResponse(BaseModel):
