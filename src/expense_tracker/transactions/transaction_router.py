@@ -1,4 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, status, Depends
+
+from expense_tracker.db import get_async_session
+from expense_tracker.transactions.schemas import TransactionCreate
 
 transaction_router = APIRouter(
     prefix="/transactions",
@@ -11,8 +14,11 @@ transaction_router = APIRouter(
 async def get_all_transactions(page: int = 1, size: int = 100):
     pass
 
-@transaction_router.post("/")
-async def create_transaction():
+@transaction_router.post(
+    "/",
+    status_code=status.HTTP_201_CREATED
+)
+async def create_transaction(transaction:TransactionCreate, session = Depends(get_async_session)):
     pass
 
 @transaction_router.get("/{id}")
