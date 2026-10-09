@@ -1,9 +1,13 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.util import await_
+
 from expense_tracker.db import get_async_session
 from expense_tracker.transactions import transaction_service
-from expense_tracker.transactions.exceptions import CategoryNotFoundException, NegativeTransactionException
+from expense_tracker.categories.exceptions import CategoryNotFoundException
+from expense_tracker.transactions.exceptions import NegativeTransactionException, \
+    TransactionNotFoundException
 from expense_tracker.transactions.schemas import TransactionCreate, TransactionResponse
 
 transaction_router = APIRouter(
@@ -17,11 +21,7 @@ async def get_all_transactions(page: int = 1, size: int = 100):
     pass
 
 
-@transaction_router.post(
-    "/",
-    response_model=TransactionResponse,
-    status_code=status.HTTP_201_CREATED,
-)
+@transaction_router.post("/", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED)
 async def create_transaction(transaction: TransactionCreate, session: AsyncSession = Depends(get_async_session)):
     try:
         return await transaction_service.create_transaction(transaction, session)
@@ -29,10 +29,18 @@ async def create_transaction(transaction: TransactionCreate, session: AsyncSessi
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except CategoryNotFoundException as e:
         raise HTTPException( status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 @transaction_router.get("/{id}")
-async def get_transaction(id: int):
-    pass
+async def get_transaction(id : int, session: AsyncSession = Depends(get_async_session)):
+    try:
+        return await transaction_service.get_transaction_by_id(id, session)
+    except TransactionNotFoundException  as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
 
 
 @transaction_router.patch("/{id}")

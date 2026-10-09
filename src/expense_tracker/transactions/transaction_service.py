@@ -1,8 +1,12 @@
+from select import select
+
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from expense_tracker.transactions.exceptions import CategoryNotFoundException, NegativeTransactionException
-from expense_tracker.transactions.models import Category, Transaction
+from expense_tracker.categories.exceptions import CategoryNotFoundException
+from expense_tracker.transactions.exceptions import NegativeTransactionException, TransactionNotFoundException
+from expense_tracker.categories.models import Category
+from expense_tracker.transactions.models import Transaction
 from expense_tracker.transactions.schemas import TransactionCreate
 
 
@@ -29,3 +33,13 @@ async def create_transaction(data: TransactionCreate, session: AsyncSession) -> 
         raise
     await session.refresh(transaction_obj)
     return transaction_obj
+
+
+async def get_transaction_by_id(transaction_id: int, session: AsyncSession) -> Transaction:
+
+    transaction = await session.get(Transaction, transaction_id)
+    if transaction is None:
+        raise TransactionNotFoundException(transaction_id)
+
+    return transaction
+    

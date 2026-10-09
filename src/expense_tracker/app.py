@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 
 import fastapi
 
+from .categories.category_router import category_router
 from .db import create_db_and_tables, engine
 from .transactions.transaction_router import transaction_router
 
@@ -22,3 +23,4 @@ async def root():
 
 
 app.include_router(transaction_router)
+app.include_router(category_router)

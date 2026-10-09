@@ -1,6 +1,6 @@
 import enum
 
-from sqlalchemy import BigInteger, Column, DateTime, Integer, Numeric, String, TypeDecorator, func
+from sqlalchemy import BigInteger, Column, DateTime, ForeignKey, Integer, Numeric, String, TypeDecorator, func
 from expense_tracker.db import Base
 
 class TransactionType(enum.IntEnum):
@@ -33,12 +33,7 @@ class Transaction(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     amount = Column(Numeric(12, 2), nullable=False)
     transaction_type = Column(IntEnumType(TransactionType), nullable=False)
-    category = Column(Integer, nullable=False)
+    category = Column(Integer, ForeignKey("categories.id", ondelete="RESTRICT"), nullable=False)
     note = Column(String(80), nullable=True)
     transaction_date_time = Column(BigInteger, nullable=False)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
-
-class Category(Base):
-    __tablename__ = "categories"
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(80), nullable=False)
