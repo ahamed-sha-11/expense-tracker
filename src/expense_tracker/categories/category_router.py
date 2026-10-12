@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from expense_tracker.db import get_async_session
@@ -13,8 +13,12 @@ category_router = APIRouter(
 
 
 @category_router.get("/")
-async def get_all_categories():
-    pass
+async def get_all_categories(
+        page: int = Query(1, ge=1),
+        size: int = Query(100, ge=1, le=100),
+        session: AsyncSession = Depends(get_async_session),
+):
+    return await category_service.get_all_categories(session, page, size)
 
 
 @category_router.post("/", response_model=CategoryResponse, status_code=status.HTTP_201_CREATED)

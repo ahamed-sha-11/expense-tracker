@@ -23,6 +23,18 @@ async def create_category(data: CategoryCreate, session: AsyncSession) -> Catego
     await session.refresh(category_obj)
     return category_obj
 
+async def get_all_categories(session: AsyncSession, page: int, size: int) -> list[Category]:
+    offset = (page - 1) * size
+
+    statement = (
+        select(Category)
+        .order_by(Category.name)
+        .offset(offset)
+        .limit(size)
+    )
+
+    result = await session.execute(statement)
+    return list(result.scalars().all())
 
 async def get_category_by_id(category_id: int, session: AsyncSession) -> Category:
     category = await session.get(Category, category_id)
