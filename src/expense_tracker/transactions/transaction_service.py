@@ -62,7 +62,7 @@ async def update_transaction(transaction_id: int, data: TransactionUpdate, sessi
     sent_fields = data.model_dump(exclude_none=True)
 
     if "category" in sent_fields:
-        category = await category_service.get_category_by_id(transaction.category, session)
+        category = await category_service.get_category_by_id(sent_fields["category"], session)
         if category is None:
             raise CategoryNotFoundException(transaction.category)
 

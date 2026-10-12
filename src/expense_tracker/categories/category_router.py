@@ -12,7 +12,7 @@ category_router = APIRouter(
 )
 
 
-@category_router.get("/")
+@category_router.get("/", response_model=list[CategoryResponse])
 async def get_all_categories(
         page: int = Query(1, ge=1),
         size: int = Query(100, ge=1, le=100),
