@@ -2,6 +2,8 @@
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from expense_tracker.categories import category_service
 from expense_tracker.categories.exceptions import CategoryNotFoundException
 from expense_tracker.categories.models import Category
 from expense_tracker.transactions.exceptions import NegativeTransactionException, TransactionNotFoundException
@@ -56,9 +58,13 @@ async def get_transaction_by_id(transaction_id: int, session: AsyncSession) -> T
     return transaction
 
 async def update_transaction(transaction_id: int, data: TransactionUpdate, session: AsyncSession) -> Transaction:
-
     transaction = await get_transaction_by_id(transaction_id, session)
     sent_fields = data.model_dump(exclude_none=True)
+
+    if "category" in sent_fields:
+        category = await category_service.get_category_by_id(transaction.category, session)
+        if category is None:
+            raise CategoryNotFoundException(transaction.category)
 
     for field, value in sent_fields.items():
         if field == "transaction_date_time":
@@ -66,7 +72,11 @@ async def update_transaction(transaction_id: int, data: TransactionUpdate, sessi
 
         setattr(transaction, field, value)
 
-    await session.commit()
+    try:
+        await session.commit()
+    except SQLAlchemyError:
+        await session.rollback()
+        raise
     await session.refresh(transaction)
     return transaction
 
