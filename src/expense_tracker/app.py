@@ -16,11 +16,5 @@ async def lifespan(app: fastapi.FastAPI) -> AsyncIterator[None]:
 
 
 app = fastapi.FastAPI(lifespan=lifespan)
-
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-
 app.include_router(transaction_router)
 app.include_router(category_router)
