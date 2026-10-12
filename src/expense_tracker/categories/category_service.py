@@ -1,9 +1,11 @@
+from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from expense_tracker.categories.exceptions import CategoryNotFoundException
+from expense_tracker.categories.exceptions import CategoryInUseException, CategoryNotFoundException
 from expense_tracker.categories.models import Category
-from expense_tracker.categories.schemas import CategoryCreate
+from expense_tracker.categories.schemas import CategoryCreate, CategoryUpdate
+from expense_tracker.transactions.models import Transaction
 
 
 async def create_category(data: CategoryCreate, session: AsyncSession) -> Category:
@@ -28,3 +30,35 @@ async def get_category_by_id(category_id: int, session: AsyncSession) -> Categor
         raise CategoryNotFoundException(category_id)
 
     return category
+
+
+async def update_category(category_id: int, data: CategoryUpdate, session: AsyncSession) -> Category:
+    category = await get_category_by_id(category_id, session)
+
+    category.name = data.name.lower().capitalize()
+
+    try:
+        await session.commit()
+    except SQLAlchemyError:
+        await session.rollback()
+        raise
+    await session.refresh(category)
+    return category
+
+
+async def delete_category(category_id: int, session: AsyncSession) -> None:
+    category = await get_category_by_id(category_id, session)
+
+    in_use = await session.scalar(
+        select(Transaction.id).where(Transaction.category == category_id).limit(1)
+    )
+
+    if in_use is not None:
+        raise CategoryInUseException(category_id)
+
+    await session.delete(category)
+    try:
+        await session.commit()
+    except SQLAlchemyError:
+        await session.rollback()
+        raise

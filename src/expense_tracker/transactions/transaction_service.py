@@ -58,7 +58,7 @@ async def get_transaction_by_id(transaction_id: int, session: AsyncSession) -> T
 async def update_transaction(transaction_id: int, data: TransactionUpdate, session: AsyncSession) -> Transaction:
 
     transaction = await get_transaction_by_id(transaction_id, session)
-    sent_fields = data.model_dump(exclude_unset=True)
+    sent_fields = data.model_dump(exclude_none=True)
 
     for field, value in sent_fields.items():
         if field == "transaction_date_time":
@@ -69,3 +69,13 @@ async def update_transaction(transaction_id: int, data: TransactionUpdate, sessi
     await session.commit()
     await session.refresh(transaction)
     return transaction
+
+async def delete_transaction(transaction_id: int, session: AsyncSession) -> None:
+    transaction = await get_transaction_by_id(transaction_id, session)   # raises if not found
+
+    await session.delete(transaction)
+    try:
+        await session.commit()
+    except SQLAlchemyError:
+        await session.rollback()
+        raise

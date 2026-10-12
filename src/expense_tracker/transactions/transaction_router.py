@@ -1,6 +1,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from expense_tracker.categories.exceptions import CategoryNotFoundException
 from expense_tracker.db import get_async_session
 from expense_tracker.transactions import transaction_service
@@ -21,7 +22,7 @@ async def get_all_transactions(
 ):
     return await transaction_service.get_all_transactions(session, page, size)
 
-@transaction_router.get("/{id}")
+@transaction_router.get("/{id}", response_model=TransactionResponse)
 async def get_transaction(id : int, session: AsyncSession = Depends(get_async_session)):
     try:
         return await transaction_service.get_transaction_by_id(id, session)
@@ -47,11 +48,15 @@ async def update_transaction(transaction_id: int, data: TransactionUpdate, sessi
         return await transaction_service.update_transaction(transaction_id, data, session)
     except TransactionNotFoundException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except CategoryNotFoundException as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-
-@transaction_router.delete("/{id}")
-async def delete_transaction(id: int):
-    pass
+@transaction_router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_transaction(id: int, session: AsyncSession = Depends(get_async_session)):
+    try:
+        await transaction_service.delete_transaction(id, session)
+    except TransactionNotFoundException as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
