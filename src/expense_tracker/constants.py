@@ -1,0 +1,3 @@
+
+DEFAULT_CATEGORY_ID = -1
+DEFAULT_CATEGORY_NAME = "Miscellaneous"

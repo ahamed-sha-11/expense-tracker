@@ -3,14 +3,17 @@ from contextlib import asynccontextmanager
 
 import fastapi
 
+from .categories import category_service
 from .categories.category_router import category_router
-from .db import create_db_and_tables, engine
+from .db import create_db_and_tables, engine, async_session
 from .transactions.transaction_router import transaction_router
 
 
 @asynccontextmanager
 async def lifespan(app: fastapi.FastAPI) -> AsyncIterator[None]:
     await create_db_and_tables()
+    async with async_session() as session:
+        await category_service.ensure_default_category(session)
     yield
     await engine.dispose()
 
