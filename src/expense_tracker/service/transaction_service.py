@@ -3,12 +3,10 @@ from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from expense_tracker.categories import category_service
-from expense_tracker.categories.exceptions import CategoryNotFoundException
-from expense_tracker.categories.models import Category
-from expense_tracker.transactions.exceptions import NegativeTransactionException, TransactionNotFoundException
-from expense_tracker.transactions.models import Transaction
-from expense_tracker.transactions.schemas import TransactionCreate, TransactionUpdate
+from expense_tracker.exceptions import CategoryNotFoundException, NegativeTransactionException, TransactionNotFoundException
+from expense_tracker.models import Category, Transaction
+from expense_tracker.schemas import TransactionCreate, TransactionUpdate
+from expense_tracker.service import category_service
 
 
 async def get_all_transactions(session: AsyncSession, page: int, size: int) -> list[Transaction]:

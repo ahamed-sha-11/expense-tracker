@@ -1,11 +1,10 @@
-import os
 from collections.abc import AsyncIterator
 
 from sqlalchemy import event
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./test.db")
+from expense_tracker.config.config import DATABASE_URL
 
 
 class Base(DeclarativeBase):

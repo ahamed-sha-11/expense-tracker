@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from expense_tracker.db import get_async_session
-from expense_tracker.users import user_service
-from expense_tracker.users.schemas import UserCreate, UserResponse
+from expense_tracker.config.database import get_async_session
+from expense_tracker.schemas import UserCreate, UserResponse
+from expense_tracker.service import user_service
 
 user_router= APIRouter(
     prefix="/users",

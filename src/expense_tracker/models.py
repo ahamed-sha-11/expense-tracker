@@ -1,7 +1,10 @@
+import datetime
 import enum
 
 from sqlalchemy import BigInteger, Column, DateTime, ForeignKey, Integer, Numeric, String, TypeDecorator, func
-from expense_tracker.db import Base
+
+from expense_tracker.config.database import Base
+
 
 class TransactionType(enum.IntEnum):
     INCOME = 1
@@ -27,6 +30,13 @@ class IntEnumType(TypeDecorator):
         return self.enum_type(value)
 
 
+class Category(Base):
+    __tablename__ = "categories"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(80), nullable=False)
+
+
 class Transaction(Base):
     __tablename__ = "transactions"
 
@@ -37,3 +47,17 @@ class Transaction(Base):
     note = Column(String(80), nullable=True)
     transaction_date_time = Column(BigInteger, nullable=False)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True)
+    email = Column(String, unique=True, nullable=False, index=True)
+    username = Column(String(50), unique=True, nullable=False)
+    password_hash = Column(String, nullable=False)
+    created_at = Column(
+        DateTime(timezone=True),
+        default=lambda: datetime.datetime.now(datetime.timezone.utc),
+        nullable=False,
+    )

@@ -1,9 +1,9 @@
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from expense_tracker.security.passwords import hash_password
-from expense_tracker.users.models import User
-from expense_tracker.users.schemas import UserCreate
+from expense_tracker.models import User
+from expense_tracker.schemas import UserCreate
+from expense_tracker.utils import hash_password
 
 
 async def create_user(data : UserCreate, session : AsyncSession) -> User:
