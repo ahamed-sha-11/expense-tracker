@@ -1,10 +1,7 @@
-from pydantic import BaseModel, EmailStr, ConfigDict, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
+from expense_tracker.constants import ALLOWED_PASSWORD_CHARACTERS
 
-class UserDto(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    username: str
-    email: EmailStr
 
 class UserResponse(BaseModel):
     username: str
@@ -13,5 +10,13 @@ class UserResponse(BaseModel):
 
 class UserCreate(BaseModel):
     email: EmailStr
-    username: str
-    password: str = Field(min_length=8, max_length=72)
+    username: str = Field(min_length=3, max_length=50)
+    password: str = Field(min_length=8, max_length=20)
+
+    @field_validator("password")
+    @classmethod
+    def check_password_characters(cls, password: str) -> str:
+        for character in password:
+            if character not in ALLOWED_PASSWORD_CHARACTERS:
+                raise ValueError("Password can only contain letters, digits and symbols like !@#$%^&*")
+        return password
