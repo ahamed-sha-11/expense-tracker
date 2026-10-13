@@ -1,19 +1,20 @@
 import datetime
 
-from sqlalchemy import Column, String, Integer, DateTime
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import Column, DateTime, Integer, String
 
+from expense_tracker.db import Base
 
-class Base(DeclarativeBase):
-    pass
 
 class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
-    email = Column(String)
-    username = Column(String)
-    password = Column(String)
-    created_at = Column(DateTime, default=datetime.datetime.now)
-
+    email = Column(String, unique=True, nullable=False, index=True)
+    username = Column(String, unique=True, nullable=False)
+    password_hash = Column(String, nullable=False)
+    created_at = Column(
+        DateTime(timezone=True),
+        default=lambda: datetime.datetime.now(datetime.timezone.utc),
+        nullable=False,
+    )
 
