@@ -1,7 +1,7 @@
 [project]
 name = "expense-tracker"
 version = "0.1.0"
-description = "Add your description here"
+description = "Expense tracker API built with FastAPI and SQLAlchemy"
 readme = "README.md"
 authors = [
     { name = "ahamed sha", email = "iahamedsha@gmail.com" }
@@ -11,7 +11,7 @@ dependencies = [
     "aiosqlite>=0.22.1",
     "dotenv>=0.9.9",
     "fastapi==0.143.0",
-    "pydantic==2.14.0",
+    "pydantic==2.14.1",
     "sqlalchemy[asyncio]>=2.1.4",
     "uvicorn>=0.54.0",
 ]

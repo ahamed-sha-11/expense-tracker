@@ -1,4 +1,6 @@
-from sqlalchemy import Column, String, Integer
+import datetime
+
+from sqlalchemy import Column, String, Integer, DateTime
 from sqlalchemy.orm import DeclarativeBase
 
 
@@ -12,4 +14,6 @@ class User(Base):
     email = Column(String)
     username = Column(String)
     password = Column(String)
+    created_at = Column(DateTime, default=datetime.datetime.now)
+
 
