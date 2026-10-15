@@ -14,3 +14,4 @@ class Transaction(Base):
     note = Column(String(80), nullable=True)
     transaction_date_time = Column(BigInteger, nullable=False)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)

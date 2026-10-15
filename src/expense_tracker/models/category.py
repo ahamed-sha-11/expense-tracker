@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, String
 
 from expense_tracker.core.database import Base
 
@@ -9,3 +9,4 @@ class Category(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(80), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
