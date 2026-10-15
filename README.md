@@ -1,29 +1,37 @@
 # Expense Tracker API
 
-A small API I'm building to learn FastAPI. You sign up, log in, and keep track of your own expenses and categories. Nobody else can see your data.
+A simple API for tracking your expenses, built while learning FastAPI.
 
-Built with FastAPI, async SQLAlchemy (SQLite), Redis for login sessions, and uv.
+## What it does
 
-## Run it
+- Sign up and log in
+- Create your own categories (Food, Rent, ...)
+- Add, edit and delete transactions
+- Your data is private: other users can't see it
 
-You need Python 3.14, [uv](https://docs.astral.sh/uv/), and Redis running locally.
+If you add a transaction without a category, it goes into **Miscellaneous**.
+
+## Getting started
+
+You'll need **Python 3.14**, **[uv](https://docs.astral.sh/uv/)** and **Redis** running on your machine.
 
 ```bash
 uv sync
 uv run uvicorn expense_tracker.main:app --reload
 ```
 
-Then open http://127.0.0.1:8000/docs.
+Open **http://127.0.0.1:8000/docs** in your browser.
 
-## Try it
+## How to use it
 
-1. Sign up with `POST /users/`.
-2. Click **Authorize** and log in with your email and password.
-3. Add some categories and transactions.
+1. Create an account with `POST /users/`
+2. Click **Authorize** at the top of the page and log in with your **email** and password
+3. You can now use the category and transaction endpoints
 
-There's a shared **Miscellaneous** category (id `-1`) everyone can use.
+## Built with
 
-## Good to know
+FastAPI · SQLAlchemy · SQLite · Redis · uv
 
-- There are no migrations yet. If you change a model, delete `test.db` and restart.
-- `DATABASE_URL` and `REDIS_URL` can be set as environment variables.
+## Note
+
+There are no database migrations yet. If you change a model, delete `test.db` and restart the app.
