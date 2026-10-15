@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from expense_tracker.config.database import get_async_session
-from expense_tracker.exceptions import CategoryInUseException, CategoryNotFoundException
-from expense_tracker.schemas import CategoryCreate, CategoryResponse, CategoryUpdate
-from expense_tracker.service import category_service
+from expense_tracker.core.database import get_async_session
+from expense_tracker.exceptions.category import CategoryInUseException, CategoryNotFoundException
+from expense_tracker.schemas.category import CategoryCreate, CategoryResponse, CategoryUpdate
+from expense_tracker.services import category_service
 
 category_router = APIRouter(
     prefix="/categories",

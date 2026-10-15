@@ -2,10 +2,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from expense_tracker.config.database import get_async_session
-from expense_tracker.exceptions import CategoryNotFoundException, NegativeTransactionException, TransactionNotFoundException
-from expense_tracker.schemas import TransactionCreate, TransactionResponse, TransactionUpdate
-from expense_tracker.service import transaction_service
+from expense_tracker.core.database import get_async_session
+from expense_tracker.exceptions.category import CategoryNotFoundException
+from expense_tracker.exceptions.transaction import NegativeTransactionException, TransactionNotFoundException
+from expense_tracker.schemas.transaction import TransactionCreate, TransactionResponse, TransactionUpdate
+from expense_tracker.services import transaction_service
 
 transaction_router = APIRouter(
     prefix="/transactions",

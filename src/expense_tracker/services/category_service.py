@@ -2,10 +2,11 @@ from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from expense_tracker.config.config import DEFAULT_CATEGORY_ID, DEFAULT_CATEGORY_NAME
-from expense_tracker.exceptions import CategoryInUseException, CategoryNotFoundException
-from expense_tracker.models import Category, Transaction
-from expense_tracker.schemas import CategoryCreate, CategoryUpdate
+from expense_tracker.core.config import DEFAULT_CATEGORY_ID, DEFAULT_CATEGORY_NAME
+from expense_tracker.exceptions.category import CategoryInUseException, CategoryNotFoundException
+from expense_tracker.models.category import Category
+from expense_tracker.models.transaction import Transaction
+from expense_tracker.schemas.category import CategoryCreate, CategoryUpdate
 
 
 async def ensure_default_category(session: AsyncSession) -> None:

@@ -3,8 +3,9 @@ from collections.abc import AsyncIterator
 from sqlalchemy import event
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
-
-from expense_tracker.config.config import DATABASE_URL
+from fastapi import Request
+from redis.asyncio import Redis
+from expense_tracker.core.config import DATABASE_URL
 
 
 class Base(DeclarativeBase):
@@ -28,3 +29,6 @@ async def create_db_and_tables() -> None:
 async def get_async_session() -> AsyncIterator[AsyncSession]:
     async with async_session() as session:
         yield session
+
+def get_redis(request: Request) -> Redis:
+    return request.app.state.redis
