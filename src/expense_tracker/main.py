@@ -17,7 +17,7 @@ from expense_tracker.services import category_service
 async def lifespan(app: fastapi.FastAPI) -> AsyncIterator[None]:
     await create_db_and_tables()
     async with async_session() as session:
-        await category_service.ensure_default_category(session)
+        await category_service.ensure_default_categories(session)
 
     app.state.redis = Redis.from_url(REDIS_URL, decode_responses=True)
 

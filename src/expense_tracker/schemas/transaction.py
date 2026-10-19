@@ -10,14 +10,14 @@ from expense_tracker.models.types import TransactionType
 class TransactionCreate(BaseModel):
     amount: Decimal = Field(gt=0, max_digits=12, decimal_places=2)
     transaction_type: TransactionType
-    category: int = Field(default=DEFAULT_CATEGORY_ID, ge=-1)
+    category: int = Field(default=DEFAULT_CATEGORY_ID, ge=-3)
     note: str | None = Field(default=None, max_length=80)
     transaction_date_time: AwareDatetime
 
 class TransactionUpdate(BaseModel):
     amount: Decimal | None = Field(default=None, gt=0, max_digits=12, decimal_places=2)
     transaction_type: TransactionType | None = None
-    category: int | None = Field(default=None, ge=-1)
+    category: int | None = Field(default=None, ge=-3)
     note: str | None = Field(default=None, max_length=80)
     transaction_date_time: AwareDatetime | None = None
 

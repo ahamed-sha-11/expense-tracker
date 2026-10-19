@@ -2,7 +2,14 @@ from sqlalchemy import or_, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from expense_tracker.core.config import DEFAULT_CATEGORY_ID, DEFAULT_CATEGORY_NAME
+from expense_tracker.core.config import (
+    DEFAULT_CATEGORY_ID,
+    DEFAULT_CATEGORY_NAME,
+    I_OWE_CATEGORY_ID,
+    I_OWE_CATEGORY_NAME,
+    OWED_TO_ME_CATEGORY_ID,
+    OWED_TO_ME_CATEGORY_NAME,
+)
 from expense_tracker.exceptions.category import (
     CategoryInUseException,
     CategoryNotFoundException,
@@ -13,10 +20,18 @@ from expense_tracker.models.transaction import Transaction
 from expense_tracker.schemas.category import CategoryCreate, CategoryUpdate
 
 
-async def ensure_default_category(session: AsyncSession) -> None:
-    if await session.get(Category, DEFAULT_CATEGORY_ID) is None:
-        session.add(Category(id=DEFAULT_CATEGORY_ID, name=DEFAULT_CATEGORY_NAME))
-        await session.commit()
+async def ensure_default_categories(session: AsyncSession) -> None:
+    default_categories = [
+        (DEFAULT_CATEGORY_ID, DEFAULT_CATEGORY_NAME),
+        (OWED_TO_ME_CATEGORY_ID, OWED_TO_ME_CATEGORY_NAME),
+        (I_OWE_CATEGORY_ID, I_OWE_CATEGORY_NAME),
+    ]
+
+    for category_id, category_name in default_categories:
+        if await session.get(Category, category_id) is None:
+            session.add(Category(id=category_id, name=category_name))
+
+    await session.commit()
 
 
 async def create_category(data: CategoryCreate, user_id: int, session: AsyncSession) -> Category:
