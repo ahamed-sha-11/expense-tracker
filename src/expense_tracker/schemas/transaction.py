@@ -1,7 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 
-from pydantic import AwareDatetime, BaseModel, Field
+from pydantic import AwareDatetime, BaseModel, Field, field_validator
 
 from expense_tracker.core.config import DEFAULT_CATEGORY_ID
 from expense_tracker.models.types import TransactionType
@@ -21,6 +21,13 @@ class TransactionUpdate(BaseModel):
     note: str | None = Field(default=None, max_length=80)
     transaction_date_time: AwareDatetime | None = None
 
+    @field_validator("amount", "transaction_type", "category", "transaction_date_time")
+    @classmethod
+    def reject_null(cls, value):
+        if value is None:
+            raise ValueError("Can't be empty. Leave the field out to keep its current value")
+        return value
+
 
 class TransactionResponse(BaseModel):
     id: int
@@ -29,3 +36,26 @@ class TransactionResponse(BaseModel):
     category: int
     note: str | None
     transaction_date_time: datetime
+
+
+class DayTotal(BaseModel):
+    day: int
+    spent: Decimal
+    earned: Decimal
+
+
+class CategoryTotal(BaseModel):
+    category: int
+    spent: Decimal
+
+
+class MonthlyReportResponse(BaseModel):
+    year: int
+    month: int
+    earned: Decimal
+    spent: Decimal
+    left: Decimal
+    days: list[DayTotal]
+    categories: list[CategoryTotal]
+    owed_to_me: Decimal
+    i_owe: Decimal

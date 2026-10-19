@@ -3,6 +3,7 @@ import string
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./test.db")
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/1")
+FRONTEND_ORIGINS = os.getenv("FRONTEND_ORIGINS", "http://localhost:5173").split(",")
 SESSION_TTL_SECONDS=6_04_800
 
 DEFAULT_CATEGORY_ID = -1

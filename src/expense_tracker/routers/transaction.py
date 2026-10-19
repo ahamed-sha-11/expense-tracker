@@ -7,8 +7,13 @@ from expense_tracker.core.security import get_current_user
 from expense_tracker.exceptions.category import CategoryNotFoundException
 from expense_tracker.exceptions.transaction import NegativeTransactionException, TransactionNotFoundException
 from expense_tracker.models.user import User
-from expense_tracker.schemas.transaction import TransactionCreate, TransactionResponse, TransactionUpdate
-from expense_tracker.services import transaction_service
+from expense_tracker.schemas.transaction import (
+    MonthlyReportResponse,
+    TransactionCreate,
+    TransactionResponse,
+    TransactionUpdate,
+)
+from expense_tracker.services import report_service, transaction_service
 
 transaction_router = APIRouter(
     prefix="/transactions",
@@ -25,6 +30,15 @@ async def get_all_transactions(
 ):
     return await transaction_service.get_all_transactions(current_user.id, session, page, size)
 
+@transaction_router.get("/monthly-report", response_model=MonthlyReportResponse)
+async def get_monthly_report(
+    year: int = Query(ge=2000, le=2100),
+    month: int = Query(ge=1, le=12),
+    session: AsyncSession = Depends(get_async_session),
+    current_user: User = Depends(get_current_user),
+):
+    return await report_service.get_monthly_report(year, month, current_user.id, session)
+
 @transaction_router.get("/{id}", response_model=TransactionResponse)
 async def get_transaction(
     id : int,
@@ -35,8 +49,6 @@ async def get_transaction(
         return await transaction_service.get_transaction_by_id(id, current_user.id, session)
     except TransactionNotFoundException  as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 @transaction_router.post("/", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED)
 async def create_transaction(
@@ -50,8 +62,6 @@ async def create_transaction(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except CategoryNotFoundException as e:
         raise HTTPException( status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 @transaction_router.patch("/{transaction_id}", response_model=TransactionResponse)
 async def update_transaction(
@@ -66,8 +76,6 @@ async def update_transaction(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except CategoryNotFoundException as e:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 @transaction_router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)

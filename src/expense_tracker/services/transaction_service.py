@@ -62,7 +62,7 @@ async def get_transaction_by_id(transaction_id: int, user_id: int, session: Asyn
 
 async def update_transaction(transaction_id: int, data: TransactionUpdate, user_id: int, session: AsyncSession) -> Transaction:
     transaction = await get_transaction_by_id(transaction_id, user_id, session)
-    sent_fields = data.model_dump(exclude_none=True)
+    sent_fields = data.model_dump(exclude_unset=True)
 
     if "category" in sent_fields:
         await category_service.get_category_by_id(sent_fields["category"], user_id, session)

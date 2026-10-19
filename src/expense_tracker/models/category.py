@@ -10,3 +10,7 @@ class Category(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(80), nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+
+    @property
+    def is_default(self) -> bool:
+        return self.user_id is None

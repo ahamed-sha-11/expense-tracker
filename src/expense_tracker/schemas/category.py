@@ -10,3 +10,4 @@ class CategoryUpdate(BaseModel):
 class CategoryResponse(BaseModel):
     id: int
     name: str
+    is_default: bool
