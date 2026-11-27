@@ -1,22 +1,31 @@
 import datetime
 from decimal import Decimal
 
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from expense_tracker.core.config import I_OWE_CATEGORY_ID, OWED_TO_ME_CATEGORY_ID
 from expense_tracker.models.transaction import Transaction
 from expense_tracker.models.types import TransactionType
-from expense_tracker.schemas.transaction import CategoryTotal, DayTotal, MonthOnMonthComparisonResponse, MonthlyReportResponse
+from expense_tracker.schemas.transaction import (
+    CategoryTotal,
+    DayTotal,
+    MonthOnMonthComparisonResponse,
+    MonthlyReportResponse,
+)
 
-SETTLE_UP_CATEGORY_IDS = [OWED_TO_ME_CATEGORY_ID, I_OWE_CATEGORY_ID]
+
+SETTLE_UP_CATEGORY_IDS = [
+    OWED_TO_ME_CATEGORY_ID,
+    I_OWE_CATEGORY_ID,
+]
 
 
 async def get_monthly_report(
     year: int,
     month: int,
     user_id: int,
-    session: AsyncSession
+    session: AsyncSession,
 ) -> MonthlyReportResponse:
 
     timezone = datetime.timezone.utc
@@ -31,14 +40,14 @@ async def get_monthly_report(
     start_timestamp = int(month_start.timestamp())
     end_timestamp = int(next_month_start.timestamp())
 
-    base_query = select(Transaction).where(
+    statement = select(Transaction).where(
         Transaction.user_id == user_id,
         Transaction.transaction_date_time >= start_timestamp,
         Transaction.transaction_date_time < end_timestamp,
         Transaction.category.notin_(SETTLE_UP_CATEGORY_IDS),
     )
 
-    result = await session.execute(base_query)
+    result = await session.execute(statement)
     transactions = result.scalars().all()
 
     earned = Decimal("0")
@@ -52,6 +61,7 @@ async def get_monthly_report(
             transaction.transaction_date_time,
             tz=timezone,
         )
+
         day = transaction_time.day
 
         if day not in days:
@@ -101,57 +111,70 @@ async def get_monthly_report(
         i_owe=i_owe,
     )
 
-async def get_month_on_month_comparison(year: int, month_one: int, month_two: int, user_id:int, session: AsyncSession) -> MonthOnMonthComparisonResponse:
+
+async def get_month_on_month_comparison(
+    year: int,
+    month_one: int,
+    month_two: int,
+    user_id: int,
+    session: AsyncSession,
+) -> MonthOnMonthComparisonResponse:
 
     month_one, month_two = min(month_one, month_two), max(month_one, month_two)
-    month_one_report : MonthlyReportResponse = await get_monthly_report(year, month_one, user_id, session)
-    month_two_report : MonthlyReportResponse = await get_monthly_report(year, month_two, user_id, session)
-    month_on_month_difference : MonthOnMonthComparisonResponse = get_monthly_diff(month_one_report, month_two_report)
 
-    return month_on_month_difference
+    month_one_report = await get_monthly_report(
+        year, month_one, user_id, session
+    )
+
+    month_two_report = await get_monthly_report(
+        year, month_two, user_id, session
+    )
+
+    return get_monthly_diff(month_one_report, month_two_report)
+
 
 def get_monthly_diff(
     month_one_report: MonthlyReportResponse,
-    month_two_report: MonthlyReportResponse
+    month_two_report: MonthlyReportResponse,
 ) -> MonthOnMonthComparisonResponse:
 
-    year: int = month_one_report.year
-    month_one: int = month_one_report.month
-    month_two: int = month_two_report.month
+    year = month_one_report.year
+    month_one = month_one_report.month
+    month_two = month_two_report.month
 
-    month_one_income: Decimal = month_one_report.earned
-    month_two_income: Decimal = month_two_report.earned
-    income_difference: Decimal = month_two_income - month_one_income
+    month_one_income = month_one_report.earned
+    month_two_income = month_two_report.earned
+    income_difference = month_two_income - month_one_income
 
-    month_one_expense: Decimal = month_one_report.spent
-    month_two_expense: Decimal = month_two_report.spent
-    expense_difference: Decimal = month_two_expense - month_one_expense
+    month_one_expense = month_one_report.spent
+    month_two_expense = month_two_report.spent
+    expense_difference = month_two_expense - month_one_expense
 
-    month_one_spend_percentage: float = (
+    month_one_spend_percentage = (
         float(month_one_expense / month_one_income * 100)
         if month_one_income > 0 else 0.0
     )
 
-    month_two_spend_percentage: float = (
+    month_two_spend_percentage = (
         float(month_two_expense / month_two_income * 100)
         if month_two_income > 0 else 0.0
     )
 
-    spend_percentage_difference: float = (
+    spend_percentage_difference = (
         month_two_spend_percentage - month_one_spend_percentage
     )
 
-    month_one_savings_percentage: float = (
+    month_one_savings_percentage = (
         float((month_one_income - month_one_expense) / month_one_income * 100)
         if month_one_income > 0 else 0.0
     )
 
-    month_two_savings_percentage: float = (
+    month_two_savings_percentage = (
         float((month_two_income - month_two_expense) / month_two_income * 100)
         if month_two_income > 0 else 0.0
     )
 
-    savings_percentage_difference: float = (
+    savings_percentage_difference = (
         month_two_savings_percentage - month_one_savings_percentage
     )
 
