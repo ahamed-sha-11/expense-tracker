@@ -1,0 +1,22 @@
+# Secrets: pass these at run time with --env-file, never bake them into the image
+.env
+
+# Local virtual environment (built for macOS, useless inside Linux)
+.venv
+
+# Python-generated files
+__pycache__/
+*.py[oc]
+
+# Local database
+*.db
+
+# Tooling and editor folders
+.git
+.idea
+.claude
+graphify-out
+
+# Docker files themselves
+Dockerfile
+.dockerignore
