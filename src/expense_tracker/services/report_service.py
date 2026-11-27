@@ -104,8 +104,8 @@ async def get_monthly_report(
 async def get_month_on_month_comparison(year: int, month_one: int, month_two: int, user_id:int, session: AsyncSession) -> MonthOnMonthComparisonResponse:
 
     month_one, month_two = max(month_one, month_two), min(month_one, month_two)
-    month_one_report : MonthlyReportResponse = get_monthly_report(year, month_one, user_id, session)
-    month_two_report : MonthlyReportResponse = get_monthly_report(year, month_two, user_id, session)
+    month_one_report : MonthlyReportResponse = await get_monthly_report(year, month_one, user_id, session)
+    month_two_report : MonthlyReportResponse = await get_monthly_report(year, month_two, user_id, session)
     month_on_month_difference : MonthOnMonthComparisonResponse = get_monthly_diff(month_one_report, month_two_report)
 
     return month_on_month_difference
