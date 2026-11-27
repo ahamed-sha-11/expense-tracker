@@ -39,6 +39,19 @@ async def get_monthly_report(
 ):
     return await report_service.get_monthly_report(year, month, current_user.id, session)
 
+@transaction_router.get("/month-comparison", response_model=MonthlyReportResponse)
+async def get_month_comparison(
+    year: int, 
+    month_one: int, 
+    month_two: int, 
+    session: AsyncSession = Depends(get_async_session),
+    current_user: User = Depends(get_current_user)
+):
+    return await report_service.get_month_on_month_comparison(year, month_one, month_two, current_user.id, session)
+    
+
+
+
 @transaction_router.get("/{id}", response_model=TransactionResponse)
 async def get_transaction(
     id : int,

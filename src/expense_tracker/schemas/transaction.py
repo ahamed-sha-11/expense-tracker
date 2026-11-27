@@ -59,3 +59,24 @@ class MonthlyReportResponse(BaseModel):
     categories: list[CategoryTotal]
     owed_to_me: Decimal
     i_owe: Decimal
+
+class MonthOnMonthComparisonResponse:
+    year: int
+    month_one: int
+    month_two: int
+
+    month_one_income: Decimal
+    month_two_income: Decimal
+    income_difference: Decimal
+
+    month_one_expense: Decimal
+    month_two_expense: Decimal
+    expense_difference: Decimal
+
+    month_one_spend_percentage: float
+    month_two_spend_percentage: float
+    spend_percentage_difference: float
+
+    month_one_savings_percentage: float
+    month_two_savings_percentage: float
+    savings_percentage_difference: float
