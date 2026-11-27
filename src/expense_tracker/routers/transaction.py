@@ -8,6 +8,7 @@ from expense_tracker.exceptions.category import CategoryNotFoundException
 from expense_tracker.exceptions.transaction import NegativeTransactionException, TransactionNotFoundException
 from expense_tracker.models.user import User
 from expense_tracker.schemas.transaction import (
+    MonthOnMonthComparisonResponse,
     MonthlyReportResponse,
     TransactionCreate,
     TransactionResponse,
@@ -39,7 +40,7 @@ async def get_monthly_report(
 ):
     return await report_service.get_monthly_report(year, month, current_user.id, session)
 
-@transaction_router.get("/month-comparison", response_model=MonthlyReportResponse)
+@transaction_router.get("/month-comparison", response_model=MonthOnMonthComparisonResponse)
 async def get_month_comparison(
     year: int, 
     month_one: int, 
