@@ -60,7 +60,7 @@ class MonthlyReportResponse(BaseModel):
     owed_to_me: Decimal
     i_owe: Decimal
 
-class MonthOnMonthComparisonResponse:
+class MonthOnMonthComparisonResponse(BaseModel):
     year: int
     month_one: int
     month_two: int
