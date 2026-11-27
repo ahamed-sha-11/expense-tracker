@@ -42,9 +42,9 @@ async def get_monthly_report(
 
 @transaction_router.get("/month-comparison", response_model=MonthOnMonthComparisonResponse)
 async def get_month_comparison(
-    year: int, 
-    month_one: int, 
-    month_two: int, 
+    year: int = Query(ge=2000, le=2100),
+    month_one: int = Query(ge=1, le=12),
+    month_two: int = Query(ge=1, le=12),
     session: AsyncSession = Depends(get_async_session),
     current_user: User = Depends(get_current_user)
 ):
