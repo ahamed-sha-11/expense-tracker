@@ -13,11 +13,29 @@ If you add a transaction without a category, it goes into **Miscellaneous**.
 
 ## Getting started
 
-You'll need **Python 3.14**, **[uv](https://docs.astral.sh/uv/)** and **Redis** running on your machine.
+The app uses **PostgreSQL** and **Redis**. The easiest way to run everything is **Docker Compose**.
+
+1. Copy `.env.example` to `.env` and fill in the values.
+2. Start the database, Redis and the app:
 
 ```bash
+docker compose up --build
+```
+
+Open **http://127.0.0.1:8080/docs** in your browser.
+
+Inside Docker Compose the app reaches PostgreSQL at the hostname `db` and Redis at `redis`.
+
+### Running the app outside Docker
+
+You'll need **Python 3.14** and **[uv](https://docs.astral.sh/uv/)**. Start only PostgreSQL and Redis with Compose,
+then point the app at `localhost` instead of `db`:
+
+```bash
+docker compose up -d db redis
 uv sync
-uv run uvicorn expense_tracker.main:app --reload
+DATABASE_URL=postgresql+asyncpg://expense_user:<password>@localhost:5432/expense_tracker \
+  uv run uvicorn expense_tracker.main:app --reload
 ```
 
 Open **http://127.0.0.1:8000/docs** in your browser.
@@ -67,8 +85,9 @@ Lists are paged: add `?page=2&size=20` to the URL.
 
 ## Built with
 
-FastAPI · SQLAlchemy · SQLite · Redis · uv
+FastAPI · SQLAlchemy · PostgreSQL · Redis · uv
 
 ## Note
 
-There are no database migrations yet. If you change a model, delete `test.db` and restart the app.
+There are no database migrations yet. Tables are created on startup, but existing tables are never changed.
+If you change a model, drop the affected table in PostgreSQL (or reset the database) and restart the app.

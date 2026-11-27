@@ -7,7 +7,6 @@ class Category(Base):
     __tablename__ = "categories"
     __table_args__ = (
         UniqueConstraint("user_id", "name", name="uq_category_user_name"),
-        {"sqlite_autoincrement": True},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
