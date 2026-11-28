@@ -17,6 +17,7 @@ from expense_tracker.schemas.transaction import (
     MonthOnMonthComparisonResponse,
     MonthlyReportResponse,
     TransactionCreate,
+    TransactionPageResponse,
     TransactionResponse,
     TransactionUpdate,
 )
@@ -28,7 +29,7 @@ transaction_router = APIRouter(
 )
 
 
-@transaction_router.get("/", response_model=list[TransactionResponse])
+@transaction_router.get("/", response_model=TransactionPageResponse)
 async def get_all_transactions(
     page: int = Query(1, ge=1),
     size: int = Query(100, ge=1, le=100),

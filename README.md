@@ -83,6 +83,23 @@ Miscellaneous is shared by everyone, so it can't be renamed or deleted.
 
 Lists are paged: add `?page=2&size=20` to the URL.
 
+`GET /transactions/` returns the page together with paging details:
+
+```json
+{
+  "items": [ ... ],
+  "total": 556,
+  "page": 2,
+  "size": 20,
+  "total_pages": 28,
+  "has_next": true,
+  "has_previous": true
+}
+```
+
+`total` counts every transaction that matches your filters, not only the ones on this page.
+Asking for a page past the end returns an empty `items` list.
+
 **Filtering transactions**
 
 `GET /transactions/` accepts these optional filters. Use any of them together; a transaction must match all of them.

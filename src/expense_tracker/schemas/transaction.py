@@ -1,7 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 
-from pydantic import AwareDatetime, BaseModel, Field, field_validator
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, field_validator
 
 from expense_tracker.core.config import DEFAULT_CATEGORY_ID
 from expense_tracker.models.types import TransactionType
@@ -30,12 +30,25 @@ class TransactionUpdate(BaseModel):
 
 
 class TransactionResponse(BaseModel):
+    # Lets the service build this response straight from a Transaction database object
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     amount: Decimal
     transaction_type: TransactionType
     category: int
     note: str | None
     transaction_date_time: datetime
+
+
+class TransactionPageResponse(BaseModel):
+    items: list[TransactionResponse]
+    total: int            # how many transactions match the filters, across all pages
+    page: int             # the page number returned
+    size: int             # the most items a page can hold
+    total_pages: int      # 0 when nothing matches
+    has_next: bool
+    has_previous: bool
 
 
 class DayTotal(BaseModel):
