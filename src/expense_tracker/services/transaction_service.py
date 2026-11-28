@@ -1,20 +1,55 @@
+from datetime import datetime
 
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from expense_tracker.exceptions.transaction import NegativeTransactionException, TransactionNotFoundException
+from expense_tracker.exceptions.transaction import (
+    InvalidDateRangeException,
+    NegativeTransactionException,
+    TransactionNotFoundException,
+)
 from expense_tracker.models.transaction import Transaction
+from expense_tracker.models.types import TransactionType
 from expense_tracker.schemas.transaction import TransactionCreate, TransactionUpdate
 from expense_tracker.services import category_service
 
 
-async def get_all_transactions(user_id: int, session: AsyncSession, page: int, size: int) -> list[Transaction]:
+async def get_all_transactions(
+    user_id: int,
+    session: AsyncSession,
+    page: int,
+    size: int,
+    transaction_type: TransactionType | None = None,
+    category: int | None = None,
+    start_date: datetime | None = None,
+    end_date: datetime | None = None,
+) -> list[Transaction]:
+    if start_date is not None and end_date is not None and start_date > end_date:
+        raise InvalidDateRangeException()
+
     offset = (page - 1) * size
 
+    statement = select(Transaction).where(Transaction.user_id == user_id)
+
+    # Each filter is optional. Every filter that is given narrows the results further (AND).
+    if transaction_type is not None:
+        statement = statement.where(Transaction.transaction_type == transaction_type)
+
+    if category is not None:
+        statement = statement.where(Transaction.category == category)
+
+    # Dates are stored as Unix timestamps, so convert before comparing. Both ends are inclusive.
+    if start_date is not None:
+        start_timestamp = int(start_date.timestamp())
+        statement = statement.where(Transaction.transaction_date_time >= start_timestamp)
+
+    if end_date is not None:
+        end_timestamp = int(end_date.timestamp())
+        statement = statement.where(Transaction.transaction_date_time <= end_timestamp)
+
     statement = (
-        select(Transaction)
-        .where(Transaction.user_id == user_id)
+        statement
         .order_by(Transaction.transaction_date_time.desc(), Transaction.id.desc())
         .offset(offset)
         .limit(size)

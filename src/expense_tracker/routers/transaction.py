@@ -1,11 +1,17 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
+from pydantic import AwareDatetime
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from expense_tracker.core.database import get_async_session
 from expense_tracker.core.security import get_current_user
 from expense_tracker.exceptions.category import CategoryNotFoundException
-from expense_tracker.exceptions.transaction import NegativeTransactionException, TransactionNotFoundException
+from expense_tracker.exceptions.transaction import (
+    InvalidDateRangeException,
+    NegativeTransactionException,
+    TransactionNotFoundException,
+)
+from expense_tracker.models.types import TransactionType
 from expense_tracker.models.user import User
 from expense_tracker.schemas.transaction import (
     MonthOnMonthComparisonResponse,
@@ -26,10 +32,26 @@ transaction_router = APIRouter(
 async def get_all_transactions(
     page: int = Query(1, ge=1),
     size: int = Query(100, ge=1, le=100),
+    transaction_type: TransactionType | None = Query(None, description="1 = income, 2 = expense"),
+    category: int | None = Query(None, ge=-3, description="Category id"),
+    start_date: AwareDatetime | None = Query(None, description="Inclusive, with time zone, e.g. 2026-10-01T00:00:00+05:30"),
+    end_date: AwareDatetime | None = Query(None, description="Inclusive, with time zone, e.g. 2026-10-31T23:59:59+05:30"),
     session: AsyncSession = Depends(get_async_session),
     current_user: User = Depends(get_current_user),
 ):
-    return await transaction_service.get_all_transactions(current_user.id, session, page, size)
+    try:
+        return await transaction_service.get_all_transactions(
+            current_user.id,
+            session,
+            page,
+            size,
+            transaction_type=transaction_type,
+            category=category,
+            start_date=start_date,
+            end_date=end_date,
+        )
+    except InvalidDateRangeException as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(e))
 
 @transaction_router.get("/monthly-report", response_model=MonthlyReportResponse)
 async def get_monthly_report(

@@ -83,6 +83,26 @@ Miscellaneous is shared by everyone, so it can't be renamed or deleted.
 
 Lists are paged: add `?page=2&size=20` to the URL.
 
+**Filtering transactions**
+
+`GET /transactions/` accepts these optional filters. Use any of them together; a transaction must match all of them.
+
+| Filter             | Example                              | Meaning                                  |
+|--------------------|--------------------------------------|------------------------------------------|
+| `transaction_type` | `1` or `2`                           | `1` = income, `2` = expense              |
+| `category`         | `5`, `-1`                            | Only this category id                    |
+| `start_date`       | `2026-10-01T00:00:00%2B05:30`        | On or after this time (needs a time zone)|
+| `end_date`         | `2026-10-31T23:59:59Z`               | On or before this time (needs a time zone)|
+
+Example: expenses in category 5 during October 2026 (India time):
+
+```
+/transactions/?transaction_type=2&category=5&start_date=2026-10-01T00:00:00%2B05:30&end_date=2026-10-31T23:59:59%2B05:30
+```
+
+In a URL, write `+05:30` as `%2B05:30` (a plain `+` is read as a space), or use `Z` for UTC.
+`start_date` after `end_date` returns 422.
+
 ## Built with
 
 FastAPI · SQLAlchemy · PostgreSQL · Redis · uv
