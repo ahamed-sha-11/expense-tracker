@@ -11,6 +11,7 @@ from redis.asyncio import Redis
 from expense_tracker.core.config import FRONTEND_ORIGINS, REDIS_URL
 from expense_tracker.core.database import async_session, create_db_and_tables, engine
 from expense_tracker.routers.category import category_router
+from expense_tracker.routers.llm import llm_router
 from expense_tracker.routers.transaction import transaction_router
 from expense_tracker.routers.user import user_router
 from expense_tracker.services import category_service
@@ -56,6 +57,7 @@ async def validation_error_handler(request: fastapi.Request, error: RequestValid
 app.include_router(transaction_router)
 app.include_router(category_router)
 app.include_router(user_router)
+app.include_router(llm_router)
 
 
 def main():
