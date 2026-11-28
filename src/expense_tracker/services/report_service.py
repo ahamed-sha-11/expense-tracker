@@ -229,21 +229,28 @@ def get_monthly_diff(
     month_two_expense = month_two_report.spent
     expense_difference = month_two_expense - month_one_expense
 
+    # A month with no income has no spend or savings percentage, so it stays None
     month_one_spend_percentage = (
         float(month_one_expense / month_one_income * 100)
         if month_one_income > 0
-        else 0.0
+        else None
     )
 
     month_two_spend_percentage = (
         float(month_two_expense / month_two_income * 100)
         if month_two_income > 0
-        else 0.0
+        else None
     )
 
-    spend_percentage_difference = (
-        month_two_spend_percentage - month_one_spend_percentage
-    )
+    if (
+        month_one_spend_percentage is not None
+        and month_two_spend_percentage is not None
+    ):
+        spend_percentage_difference = (
+            month_two_spend_percentage - month_one_spend_percentage
+        )
+    else:
+        spend_percentage_difference = None
 
     month_one_savings_percentage = (
         float(
@@ -251,7 +258,7 @@ def get_monthly_diff(
             / month_one_income * 100
         )
         if month_one_income > 0
-        else 0.0
+        else None
     )
 
     month_two_savings_percentage = (
@@ -260,12 +267,18 @@ def get_monthly_diff(
             / month_two_income * 100
         )
         if month_two_income > 0
-        else 0.0
+        else None
     )
 
-    savings_percentage_difference = (
-        month_two_savings_percentage - month_one_savings_percentage
-    )
+    if (
+        month_one_savings_percentage is not None
+        and month_two_savings_percentage is not None
+    ):
+        savings_percentage_difference = (
+            month_two_savings_percentage - month_one_savings_percentage
+        )
+    else:
+        savings_percentage_difference = None
 
     return MonthOnMonthComparisonResponse(
         year=year,

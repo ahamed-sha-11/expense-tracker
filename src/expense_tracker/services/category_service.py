@@ -1,5 +1,5 @@
 from sqlalchemy import or_, select
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from expense_tracker.core.config import (
@@ -11,6 +11,7 @@ from expense_tracker.core.config import (
     OWED_TO_ME_CATEGORY_NAME,
 )
 from expense_tracker.exceptions.category import (
+    CategoryAlreadyExistsException,
     CategoryInUseException,
     CategoryNotFoundException,
     SystemCategoryModificationException,
@@ -34,8 +35,31 @@ async def ensure_default_categories(session: AsyncSession) -> None:
     await session.commit()
 
 
+async def ensure_category_name_available(
+    category_name: str,
+    user_id: int,
+    session: AsyncSession,
+    current_category_id: int | None = None,
+) -> None:
+    # A name is taken if the user already has it, or if a default category uses it
+    statement = select(Category.id).where(
+        Category.name == category_name,
+        or_(Category.user_id == user_id, Category.user_id.is_(None)),
+    )
+
+    # When renaming, the category's own current name does not count as taken
+    if current_category_id is not None:
+        statement = statement.where(Category.id != current_category_id)
+
+    existing_category_id = await session.scalar(statement)
+    if existing_category_id is not None:
+        raise CategoryAlreadyExistsException(category_name)
+
+
 async def create_category(data: CategoryCreate, user_id: int, session: AsyncSession) -> Category:
     category_name = data.name.lower().capitalize()
+    await ensure_category_name_available(category_name, user_id, session)
+
     category_obj = Category(
         name=category_name,
         user_id=user_id,
@@ -44,6 +68,10 @@ async def create_category(data: CategoryCreate, user_id: int, session: AsyncSess
     session.add(category_obj)
     try:
         await session.commit()
+    except IntegrityError:
+        # Two requests with the same name at the same time: the unique constraint catches the second one
+        await session.rollback()
+        raise CategoryAlreadyExistsException(category_name)
     except SQLAlchemyError:
         await session.rollback()
         raise
@@ -83,10 +111,16 @@ async def update_category(category_id: int, data: CategoryUpdate, user_id: int, 
     if category.user_id is None:
         raise SystemCategoryModificationException(category_id)
 
-    category.name = data.name.lower().capitalize()
+    category_name = data.name.lower().capitalize()
+    await ensure_category_name_available(category_name, user_id, session, category_id)
+
+    category.name = category_name
 
     try:
         await session.commit()
+    except IntegrityError:
+        await session.rollback()
+        raise CategoryAlreadyExistsException(category_name)
     except SQLAlchemyError:
         await session.rollback()
         raise

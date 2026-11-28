@@ -14,3 +14,9 @@ class SystemCategoryModificationException(Exception):
     def __init__(self, category_id: int):
         self.category_id = category_id
         super().__init__(f"Category {category_id} is a system category and cannot be changed")
+
+
+class CategoryAlreadyExistsException(Exception):
+    def __init__(self, category_name: str):
+        self.category_name = category_name
+        super().__init__(f"Category '{category_name}' already exists")

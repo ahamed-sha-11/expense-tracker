@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from expense_tracker.core.database import get_async_session
 from expense_tracker.core.security import get_current_user
 from expense_tracker.exceptions.category import (
+    CategoryAlreadyExistsException,
     CategoryInUseException,
     CategoryNotFoundException,
     SystemCategoryModificationException,
@@ -34,7 +35,10 @@ async def create_category(
         session: AsyncSession = Depends(get_async_session),
         current_user: User = Depends(get_current_user),
 ):
-    return await category_service.create_category(category, current_user.id, session)
+    try:
+        return await category_service.create_category(category, current_user.id, session)
+    except CategoryAlreadyExistsException as e:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 
 
 @category_router.get("/{id}", response_model=CategoryResponse)
@@ -62,6 +66,8 @@ async def update_category(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except SystemCategoryModificationException as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+    except CategoryAlreadyExistsException as e:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 
 
 @category_router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)

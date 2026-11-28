@@ -73,10 +73,11 @@ class MonthOnMonthComparisonResponse(BaseModel):
     month_two_expense: Decimal
     expense_difference: Decimal
 
-    month_one_spend_percentage: float
-    month_two_spend_percentage: float
-    spend_percentage_difference: float
+    # None when the month has no income, because a percentage of zero income has no meaning
+    month_one_spend_percentage: float | None
+    month_two_spend_percentage: float | None
+    spend_percentage_difference: float | None
 
-    month_one_savings_percentage: float
-    month_two_savings_percentage: float
-    savings_percentage_difference: float
+    month_one_savings_percentage: float | None
+    month_two_savings_percentage: float | None
+    savings_percentage_difference: float | None
